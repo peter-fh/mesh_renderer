@@ -12,6 +12,21 @@
 
 Transform transform;
 
+
+bool fill_mode = false;
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+		if (fill_mode) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			fill_mode = false;
+		} else {
+			fill_mode = true;
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+	}
+}
+
+
 bool first_mouse = true;
 double lastX;
 double lastY;
@@ -64,7 +79,7 @@ int main() {
 
 	GLFWwindow* window = init_window(HEIGHT, WIDTH, "MUG TIME");
 	Shader shader("vertex.glsl", "fragment.glsl");
-	Model model("./assets/bottle.obj");
+	Model model("bottle.obj");
 
 #ifdef __APPLE__
 	glViewport(0, 0, WIDTH * 2, HEIGHT * 2);
@@ -74,6 +89,7 @@ int main() {
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
 	glfwSetCursorPosCallback(window, mouse_callback);  
+	glfwSetKeyCallback(window, key_callback);
 
 	glEnable(GL_DEPTH_TEST);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -93,6 +109,7 @@ int main() {
 
 		glm::vec4 color = glm::vec4(OBJECT_COLOR);
 		shader.set4f("color", color);
+
 		model.draw();
 
 

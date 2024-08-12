@@ -1,7 +1,10 @@
 #include "model.h"
 
 Model::Model(const char* filepath){
-	load_model(std::filesystem::path(filepath));
+	std::filesystem::path assets("./assets");
+	std::filesystem::path path= assets / std::filesystem::path(filepath);
+	
+	load_model(path);
 }
 
 Model::Model(){

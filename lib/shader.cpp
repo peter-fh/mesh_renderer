@@ -87,3 +87,14 @@ void Shader::use(){
 GLint Shader::get(const std::string& name){
 	return glGetUniformLocation(this->id, name.c_str());
 }
+
+void Shader::setm4f(const std::string& name, glm::mat4& mat) const{
+	GLint matID = glGetUniformLocation(this->id, name.c_str());
+	glUniformMatrix4fv(matID, 1, GL_FALSE, &mat[0][0]);
+
+
+}
+void Shader::set4f(const std::string& name, glm::vec4& vec) const {
+	GLint vecID = glGetUniformLocation(this->id, name.c_str());
+	glUniform4f(vecID, vec[0], vec[1], vec[2], vec[3]);
+}

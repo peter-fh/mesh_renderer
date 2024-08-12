@@ -61,7 +61,6 @@ void test_error(std::string message){
 }
 
 void Mesh::draw(){
-	std::cout << "\n" << VAO << "\n";
 	glBindVertexArray(VAO);
 	test_error("Error after binding VAO");
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);

@@ -2,7 +2,6 @@
 
 Model::Model(const char* filepath){
 	load_model(std::filesystem::path(filepath));
-	std::cout << "made model\n";
 }
 
 Model::Model(){

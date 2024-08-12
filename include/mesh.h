@@ -7,7 +7,6 @@
 
 struct Vertex {
     glm::vec3 position;
-    //glm::vec3 Normal;
     Vertex(float x, float y, float z) : position(x, y, z) {}
 };
 

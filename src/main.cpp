@@ -1,75 +1,107 @@
 #include "window.h"
 #include "shader.h"
-#include "mesh.h"
 #include "model.h"
-#include "trivial_model.h"
+#include "transform.h"
 
 
 #define HEIGHT 800
 #define WIDTH 800
 
+#define BACKGROUND_COLOR 0.168f, 0.168f, 0.168f, 1.0f
+#define OBJECT_COLOR 0.0f, 1.0f, 0.8f, 1.0f
 
+Transform transform;
+
+bool first_mouse = true;
+double lastX;
+double lastY;
 void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
-}
-
-
-void testError(std::string message){
-	GLenum err;
-	while ((err = glGetError()) != GL_NO_ERROR) {
-		std::cerr << message << "\nError code:" << err << std::endl;
-		exit(1);
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+		transform.translate(0, 1, 0);
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+		transform.translate(0, -1, 0);
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+		transform.translate(-1, 0, 0);
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
+		transform.translate(1, 0, 0);
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS){
+		transform.rotate(0, -1, 0);
+	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS){
+		transform.rotate(0, 1, 0);
+	}
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS){
+		transform.scale(1);
+	}
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS){
+		transform.scale(-1);
 	}
 }
-int main()
-{
+
+void mouse_callback(GLFWwindow*, double xpos, double ypos){
+	if (first_mouse){
+		lastX = xpos;
+		lastY = ypos;
+		first_mouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = ypos - lastY;
+	lastX = xpos;
+	lastY = ypos;
+
+	transform.rotate(-glm::radians(yoffset), 0, glm::radians(xoffset));
+}
+
+int main() {
 
 	GLFWwindow* window = init_window(HEIGHT, WIDTH, "MUG TIME");
-
 	Shader shader("vertex.glsl", "fragment.glsl");
 	Model model("./assets/bottle.obj");
-	//Model model;
-	//Mesh mesh;
-	//std::cout << model;
 
-	
+#ifdef __APPLE__
+	glViewport(0, 0, WIDTH * 2, HEIGHT * 2);
+#else
 	glViewport(0, 0, WIDTH, HEIGHT);
-	testError("right after viewport");
+#endif
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	testError("right after clear colors");
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	testError("right after clear");
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
+	glfwSetCursorPosCallback(window, mouse_callback);  
+
 	glEnable(GL_DEPTH_TEST);
-	glfwSwapBuffers(window); 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+	glfwSwapInterval(1);
 
 	while (!glfwWindowShouldClose(window)) {
+
 		processInput(window);
 
-		//Sets refresh rate to 60 fps
-		glfwSwapInterval(1);
-
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClearColor(BACKGROUND_COLOR);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		shader.use();
-		testError("error after using shader");
+
+		glm::mat4 transformation = transform.matrix();
+		shader.setm4f("transform", transformation);
+
+		glm::vec4 color = glm::vec4(OBJECT_COLOR);
+		shader.set4f("color", color);
 		model.draw();
-		//mesh.draw();
-		testError("error after drawing model");
+
 
 		glfwSwapBuffers(window);
 
 		glfwPollEvents();
 	}
 
-
 	glfwDestroyWindow(window);
 	glfwTerminate();
-
 	return 1;
 }

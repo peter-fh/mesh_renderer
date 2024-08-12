@@ -6,19 +6,25 @@
 #include "shader.h"
 
 struct Vertex {
-    glm::vec3 Position;
-    glm::vec3 Normal;
+    glm::vec3 position;
+    //glm::vec3 Normal;
+    Vertex(float x, float y, float z) : position(x, y, z) {}
 };
 
 
 class Mesh {
 public:
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
+    Mesh();
+    ~Mesh();
 
     std::vector<Vertex>         vertices;
     std::vector<unsigned int>   indices;
 
-    void Draw(Shader& shader);
+    //void Draw(Shader& shader);
+    void draw();
+
+    friend std::ostream& operator<<(std::ostream& out, Mesh& mesh);
 
 private:
     unsigned int VAO, VBO, EBO;
